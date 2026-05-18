@@ -1,0 +1,11 @@
+{
+  "name": "hey-todo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A voice-powered Notion-style to-do app.",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "dev": "python3 -m http.server 4173",
+    "test": "node --check scripts/smoke-test.js"
+  }
+}
