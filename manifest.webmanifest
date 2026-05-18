@@ -1,0 +1,12 @@
+{
+  "name": "Voca — Hey Todo",
+  "short_name": "Voca",
+  "description": "A premium voice-first AI task manager with the Hey Todo wake phrase.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#080a14",
+  "theme_color": "#080a14",
+  "icons": [
+    {"src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

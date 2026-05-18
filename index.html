@@ -1,378 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080a14">
+<meta name="description" content="Voca — a premium voice-first AI task manager. Say Hey Todo to capture, organize, and complete tasks.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<title>Voca — Hey Todo</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#191919;--bg2:#202020;--bg3:#252525;--bg4:#2f2f2f;
-  --border:#333;--border2:#3d3d3d;
-  --text:#e8e8e3;--text2:#9b9b97;--text3:#6b6b68;
-  --accent:#7c6af7;--accent2:#9b8bf9;--accent-glow:rgba(124,106,247,0.18);
-  --green:#5fb863;--green-glow:rgba(95,184,99,0.18);
-  --amber:#e8a628;--amber-glow:rgba(232,166,40,0.18);
-  --red:#e06c6c;--red-glow:rgba(224,108,108,0.15);
-  --pink:#e878b0;
-  --radius:8px;--radius-lg:12px;--radius-xl:16px;
-}
-html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-
-/* Layout */
-.app{max-width:560px;margin:0 auto;padding:32px 20px 60px}
-
-/* Top bar */
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
-.page-icon{font-size:22px;margin-right:8px}
-.page-title{font-size:22px;font-weight:600;color:var(--text);letter-spacing:-0.3px;display:flex;align-items:center;gap:2px}
-.page-title span{color:var(--text2);font-weight:400;font-size:13px;margin-left:8px;margin-top:2px}
-.topbar-right{display:flex;align-items:center;gap:6px}
-.tag{font-size:11px;padding:3px 9px;border-radius:20px;border:0.5px solid var(--border2);color:var(--text3);background:var(--bg3);font-weight:500;letter-spacing:0.2px}
-
-/* Properties block */
-.props{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:24px;display:flex;flex-direction:column;gap:10px}
-.prop-row{display:flex;align-items:center;gap:0;font-size:13px}
-.prop-key{color:var(--text3);width:110px;display:flex;align-items:center;gap:6px;flex-shrink:0}
-.prop-key i{font-size:14px}
-.prop-val{color:var(--text2)}
-.prop-val.accent{color:var(--accent2)}
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:7px;animation:dot-pulse 2s ease-in-out infinite}
-@keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-
-/* Divider */
-.divider{height:0.5px;background:var(--border);margin:20px 0}
-
-/* Orb section */
-.orb-section{display:flex;flex-direction:column;align-items:center;margin-bottom:28px;gap:14px}
-.orb-container{position:relative;width:96px;height:96px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.orb-ring{position:absolute;inset:0;border-radius:50%;border:0.5px solid transparent;transition:all 0.4s}
-.orb-body{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.4s;position:relative;z-index:1}
-.orb-body i{font-size:26px;color:white;transition:all 0.3s}
-
-/* Idle */
-.orb-idle .orb-ring{border-color:var(--border2);box-shadow:0 0 0 0 transparent}
-.orb-idle .orb-body{background:var(--bg4);box-shadow:0 0 0 0 transparent}
-.orb-idle .orb-body i{color:var(--text3)}
-
-/* Listening */
-.orb-listening .orb-ring{border-color:var(--accent);box-shadow:0 0 20px var(--accent-glow),0 0 40px var(--accent-glow);animation:ring-pulse 1s ease-in-out infinite}
-.orb-listening .orb-body{background:linear-gradient(135deg,#7c6af7,#9b8bf9);box-shadow:0 0 24px var(--accent-glow)}
-.orb-listening .orb-body i{animation:mic-bounce 0.6s ease-in-out infinite}
-
-/* Processing */
-.orb-processing .orb-ring{border-color:var(--amber);box-shadow:0 0 16px var(--amber-glow);animation:ring-spin 1.5s linear infinite}
-.orb-processing .orb-body{background:linear-gradient(135deg,#e8a628,#c98c1a);box-shadow:0 0 20px var(--amber-glow)}
-.orb-processing .orb-body i{animation:spin 1s linear infinite}
-
-/* Done */
-.orb-done .orb-ring{border-color:var(--green);box-shadow:0 0 20px var(--green-glow)}
-.orb-done .orb-body{background:linear-gradient(135deg,#5fb863,#4a9e4e);box-shadow:0 0 24px var(--green-glow);animation:pop 0.35s ease-out}
-
-/* Error */
-.orb-error .orb-ring{border-color:var(--red)}
-.orb-error .orb-body{background:linear-gradient(135deg,#e06c6c,#c45252)}
-
-@keyframes ring-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-@keyframes ring-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes mic-bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes pop{0%{transform:scale(0.8)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
-
-.orb-status-wrap{text-align:center}
-.orb-label{font-size:12px;font-weight:500;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px}
-.orb-status{font-size:13px;color:var(--text2);min-height:18px}
-.orb-status.s-listening{color:var(--accent2)}
-.orb-status.s-processing{color:var(--amber)}
-.orb-status.s-done{color:var(--green)}
-.orb-status.s-error{color:var(--red)}
-
-/* Transcript */
-.transcript{font-size:13px;color:var(--text3);background:var(--bg3);border:0.5px dashed var(--border2);border-radius:var(--radius);padding:8px 14px;text-align:center;font-style:italic;display:none;max-width:360px}
-.transcript.show{display:block}
-
-/* Input row */
-.input-row{display:flex;gap:8px;margin-bottom:24px;align-items:center}
-.notion-input{flex:1;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:9px 13px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
-.notion-input::placeholder{color:var(--text3)}
-.notion-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
-.add-btn{background:var(--accent);border:none;border-radius:var(--radius);padding:9px 14px;color:white;font-size:13px;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:opacity 0.15s,transform 0.1s}
-.add-btn:hover{opacity:0.88}
-.add-btn:active{transform:scale(0.97)}
-
-/* Filter tabs */
-.filter-tabs{display:flex;gap:4px;margin-bottom:16px}
-.ftab{font-size:12px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--border);color:var(--text3);background:transparent;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
-.ftab:hover{border-color:var(--border2);color:var(--text2)}
-.ftab.active{background:var(--bg3);border-color:var(--border2);color:var(--text)}
-.task-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.task-count-label{font-size:12px;color:var(--text3)}
-.clear-btn{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:0;transition:color 0.15s}
-.clear-btn:hover{color:var(--text2)}
-
-/* Tasks */
-.task-list{display:flex;flex-direction:column;gap:1px}
-.task-item{background:var(--bg);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px;animation:fadeSlide 0.22s ease-out;transition:background 0.15s;border:0.5px solid transparent}
-.task-item:hover{background:var(--bg2);border-color:var(--border)}
-.task-item.done-item{opacity:0.45}
-@keyframes fadeSlide{from{transform:translateY(-6px);opacity:0}to{transform:translateY(0);opacity:1}}
-
-.check-box{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s}
-.check-box:hover{border-color:var(--accent)}
-.check-box.chk{background:var(--accent);border-color:var(--accent)}
-.check-box.chk i{color:white;font-size:11px}
-
-.task-body{flex:1;min-width:0}
-.task-text{font-size:14px;color:var(--text);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.task-item.done-item .task-text{text-decoration:line-through}
-.task-footer{display:flex;align-items:center;gap:8px;margin-top:2px}
-.task-time{font-size:11px;color:var(--text3)}
-
-.task-del{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:4px;display:flex;align-items:center;opacity:0;transition:opacity 0.15s,color 0.15s}
-.task-item:hover .task-del{opacity:1}
-.task-del:hover{color:var(--red)}
-
-.empty{text-align:center;padding:40px 0 20px;color:var(--text3);font-size:13px}
-.empty i{font-size:28px;display:block;margin-bottom:8px;opacity:0.4}
-
-/* Hint */
-.hint-bar{margin-top:24px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px}
-.hint-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
-.hint-cmds{display:flex;flex-wrap:wrap;gap:6px}
-.hint-cmd{font-size:11px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;padding:4px 10px;color:var(--text2);font-family:'Inter',sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:#080a14;color:#f7f8ff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid rgba(155,132,255,.85);outline-offset:3px}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}:root{--bg:#080a14;--panel:rgba(16,19,34,.72);--panel-strong:rgba(23,27,46,.9);--card:rgba(255,255,255,.07);--card-strong:rgba(255,255,255,.11);--line:rgba(255,255,255,.12);--muted:#a6adca;--soft:#d8dcf3;--text:#fbfbff;--violet:#9b84ff;--blue:#60a5fa;--cyan:#67e8f9;--green:#72e6a4;--amber:#facc6b;--rose:#fb7185;--shadow:0 24px 80px rgba(0,0,0,.45);--radius:28px;--ease:cubic-bezier(.2,.8,.2,1)}
+body:before,body:after{content:"";position:fixed;inset:auto;pointer-events:none;z-index:-2;filter:blur(8px)}body:before{width:72vw;height:72vw;max-width:760px;max-height:760px;left:-22vw;top:-24vw;background:radial-gradient(circle,rgba(155,132,255,.34),transparent 60%)}body:after{width:60vw;height:60vw;right:-18vw;top:12vh;background:radial-gradient(circle,rgba(103,232,249,.2),transparent 62%)}.mesh{position:fixed;inset:0;z-index:-3;background:radial-gradient(circle at 50% -10%,rgba(255,255,255,.13),transparent 34%),linear-gradient(160deg,#080a14 0%,#0e1021 46%,#070811 100%)}.noise{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.14;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}.app-shell{width:min(1240px,100%);margin:0 auto;padding:18px 18px 96px}.hero{min-height:100svh;display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:22px;align-items:stretch}.hero-panel,.workspace-panel,.dock,.onboarding-card,.sheet{border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.045));box-shadow:var(--shadow);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px)}.hero-panel{border-radius:36px;padding:24px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}.hero-panel:after{content:"";position:absolute;inset:-1px;background:radial-gradient(circle at 76% 20%,rgba(155,132,255,.24),transparent 34%),radial-gradient(circle at 18% 82%,rgba(103,232,249,.16),transparent 28%);pointer-events:none}.topbar{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:16px;background:conic-gradient(from 210deg,#67e8f9,#9b84ff,#fb7185,#67e8f9);display:grid;place-items:center;box-shadow:0 16px 48px rgba(155,132,255,.35);position:relative}.logo:after{content:"";position:absolute;inset:3px;border-radius:13px;background:#101222}.logo i{position:relative;z-index:1;font-size:23px}.brand-copy strong{display:block;font-weight:800;letter-spacing:-.04em}.brand-copy span{font-size:12px;color:var(--muted)}.pill-row{display:flex;gap:8px;flex-wrap:wrap}.pill{border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--soft);border-radius:999px;padding:8px 11px;font-size:12px;display:inline-flex;align-items:center;gap:7px}.hero-copy{position:relative;z-index:1;margin:64px 0 42px;max-width:760px}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:#d9d4ff;background:rgba(155,132,255,.12);border:1px solid rgba(155,132,255,.22);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:700}.hero h1{font-size:clamp(44px,8vw,98px);line-height:.88;letter-spacing:-.085em;margin:18px 0 18px}.gradient-text{background:linear-gradient(110deg,#fff 0%,#d8d1ff 36%,#8befff 72%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}.hero-copy p{max-width:640px;color:var(--muted);font-size:clamp(16px,2vw,20px);line-height:1.65;margin:0}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.primary,.secondary,.icon-btn,.quick-btn,.nav-btn,.task-action,.tab,.add-btn{border:0;transition:transform .2s var(--ease),background .2s var(--ease),border-color .2s var(--ease),box-shadow .2s var(--ease)}.primary{border-radius:18px;padding:14px 18px;background:linear-gradient(135deg,#f6f4ff,#b5a6ff);color:#111322;font-weight:800;box-shadow:0 18px 60px rgba(155,132,255,.32);display:inline-flex;align-items:center;gap:10px}.secondary{border:1px solid var(--line);border-radius:18px;padding:14px 18px;background:rgba(255,255,255,.07);color:var(--text);font-weight:700;display:inline-flex;align-items:center;gap:10px}.primary:hover,.secondary:hover,.quick-btn:hover,.add-btn:hover{transform:translateY(-2px)}.feature-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.feature{border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.065);padding:16px;min-height:126px;animation:rise .65s var(--ease) both}.feature:nth-child(2){animation-delay:.08s}.feature:nth-child(3){animation-delay:.16s}.feature i{font-size:24px;color:var(--cyan)}.feature strong{display:block;margin:14px 0 6px}.feature span{color:var(--muted);font-size:13px;line-height:1.45}.workspace-panel{border-radius:36px;padding:18px;overflow:hidden;display:flex;flex-direction:column;gap:14px;min-height:720px}.assistant-card{position:relative;border:1px solid var(--line);border-radius:30px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.055));padding:18px;overflow:hidden}.assistant-card:before{content:"";position:absolute;inset:-40% -20% auto;height:210px;background:radial-gradient(circle,rgba(155,132,255,.3),transparent 64%);pointer-events:none}.assistant-top{position:relative;display:flex;justify-content:space-between;gap:12px;align-items:center}.assistant-top h2{font-size:18px;margin:0;letter-spacing:-.04em}.assistant-top p{font-size:12px;color:var(--muted);margin:4px 0 0}.icon-btn{width:42px;height:42px;border-radius:15px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text);display:grid;place-items:center}.icon-btn:hover{background:rgba(255,255,255,.13);transform:translateY(-1px)}.voice-stage{position:relative;display:grid;place-items:center;padding:26px 0 18px}.orb{width:152px;height:152px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:radial-gradient(circle at 32% 22%,#fff,rgba(255,255,255,.28) 18%,rgba(155,132,255,.78) 42%,rgba(22,25,46,.82) 73%);box-shadow:0 0 60px rgba(155,132,255,.32),inset 0 0 28px rgba(255,255,255,.18);display:grid;place-items:center;position:relative;transition:all .35s var(--ease)}.orb:before,.orb:after{content:"";position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(155,132,255,.34);animation:pulse 2.4s infinite}.orb:after{inset:-28px;animation-delay:.35s;opacity:.5}.orb i{font-size:44px;text-shadow:0 8px 22px rgba(0,0,0,.3)}.voice-stage.listening .orb{transform:scale(1.03);box-shadow:0 0 82px rgba(103,232,249,.42),inset 0 0 28px rgba(255,255,255,.18)}.voice-stage.thinking .orb{background:radial-gradient(circle at 32% 22%,#fff,rgba(250,204,107,.78) 40%,rgba(25,27,44,.85) 76%);animation:breathe 1.1s infinite}.voice-stage.completed .orb{background:radial-gradient(circle at 32% 22%,#fff,rgba(114,230,164,.78) 42%,rgba(20,32,34,.82) 76%)}.voice-stage.error .orb{background:radial-gradient(circle at 32% 22%,#fff,rgba(251,113,133,.78) 42%,rgba(32,20,34,.82) 76%)}.waveform{height:42px;display:flex;align-items:center;justify-content:center;gap:5px;margin-top:18px}.bar{width:5px;height:11px;border-radius:999px;background:linear-gradient(#67e8f9,#9b84ff);opacity:.38;animation:wave 1s ease-in-out infinite paused}.voice-stage.listening .bar,.voice-stage.thinking .bar{animation-play-state:running}.bar:nth-child(2n){animation-delay:.12s}.bar:nth-child(3n){animation-delay:.22s}.bar:nth-child(4n){animation-delay:.32s}.voice-copy{text-align:center}.voice-copy strong{display:block;font-size:18px;letter-spacing:-.03em}.voice-copy span{display:block;color:var(--muted);font-size:13px;margin-top:6px}.transcript{min-height:46px;margin-top:14px;border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.18);padding:12px;color:var(--soft);font-size:13px;text-align:center}.status-rail{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:14px}.status-chip{border:1px solid var(--line);border-radius:13px;padding:8px 6px;text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.045)}.status-chip.active{color:white;background:rgba(155,132,255,.2);border-color:rgba(155,132,255,.42)}.command-carousel{display:flex;gap:8px;overflow:hidden;margin-top:14px}.command{white-space:nowrap;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.07);border-radius:999px;padding:8px 11px;color:#dfe3ff;font-size:12px;animation:marquee 18s linear infinite}.composer{display:flex;gap:9px}.composer input{min-width:0;flex:1;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--text);border-radius:18px;padding:14px 14px}.composer input::placeholder{color:#78809f}.add-btn{border-radius:18px;padding:0 14px;background:linear-gradient(135deg,#9b84ff,#67e8f9);font-weight:800;color:#070811}.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.06);padding:14px}.stat span{display:block;color:var(--muted);font-size:11px}.stat strong{display:block;font-size:24px;letter-spacing:-.05em;margin-top:4px}.progress-ring{--p:0;inline-size:54px;block-size:54px;border-radius:50%;background:conic-gradient(var(--green) calc(var(--p)*1%),rgba(255,255,255,.12) 0);display:grid;place-items:center}.progress-ring:after{content:attr(data-label);inline-size:42px;block-size:42px;border-radius:50%;background:#111425;display:grid;place-items:center;font-size:11px;font-weight:800}.insight-card{border:1px solid rgba(103,232,249,.18);border-radius:24px;background:linear-gradient(135deg,rgba(103,232,249,.11),rgba(155,132,255,.08));padding:15px;display:flex;gap:12px;align-items:flex-start;color:#dfe7ff}.insight-card i{color:var(--cyan);font-size:22px}.insight-card strong{font-size:13px}.insight-card p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.45}.main-board{margin-top:22px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px}.dock{border-radius:30px;padding:14px;align-self:start;position:sticky;top:18px}.nav-btn{width:100%;border:0;background:transparent;color:var(--muted);border-radius:18px;padding:13px;display:flex;align-items:center;gap:10px;font-weight:700;text-align:left}.nav-btn:hover,.nav-btn.active{background:rgba(255,255,255,.08);color:white}.nav-btn .count{margin-left:auto;color:#8790b3;font-size:12px}.quick-stack{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:8px}.quick-btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--soft);border-radius:16px;padding:11px;text-align:left;font-size:13px}.task-surface{min-width:0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:14px;margin-bottom:14px}.section-head h2{margin:0;font-size:32px;letter-spacing:-.06em}.section-head p{margin:6px 0 0;color:var(--muted)}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);padding:10px 13px}.tab.active{background:rgba(155,132,255,.18);color:white;border-color:rgba(155,132,255,.35)}.task-list{display:grid;gap:10px}.task{border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.045));padding:14px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;animation:taskIn .35s var(--ease) both;touch-action:pan-y;transition:transform .22s var(--ease),opacity .22s var(--ease),border-color .22s var(--ease)}.task.dragging{opacity:.45;transform:scale(.98)}.task:hover{border-color:rgba(255,255,255,.22);transform:translateY(-1px)}.check{width:26px;height:26px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:white;display:grid;place-items:center}.task.done{opacity:.58}.task.done .task-title{text-decoration:line-through;color:#abb2cc}.task-title{font-weight:800;letter-spacing:-.02em}.task-meta{margin-top:7px;display:flex;gap:7px;flex-wrap:wrap}.badge{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.055);border-radius:999px;padding:5px 8px;color:var(--muted);font-size:11px;display:inline-flex;align-items:center;gap:5px}.badge.high{color:#ffd4dc;background:rgba(251,113,133,.13);border-color:rgba(251,113,133,.22)}.badge.medium{color:#ffedbf;background:rgba(250,204,107,.13);border-color:rgba(250,204,107,.22)}.badge.low{color:#c8f8d8;background:rgba(114,230,164,.13);border-color:rgba(114,230,164,.22)}.task-actions{display:flex;gap:6px}.task-action{width:34px;height:34px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.06);color:var(--muted)}.task-action:hover{color:white;background:rgba(255,255,255,.12)}.empty-state{display:none;border:1px dashed rgba(255,255,255,.18);border-radius:30px;padding:32px;text-align:center;background:linear-gradient(135deg,rgba(155,132,255,.1),rgba(103,232,249,.055));color:var(--muted)}.empty-state.show{display:block}.empty-illo{width:112px;height:112px;border-radius:36px;margin:0 auto 16px;background:radial-gradient(circle at 35% 25%,#fff,rgba(103,232,249,.38) 22%,rgba(155,132,255,.28) 54%,rgba(255,255,255,.06) 76%);display:grid;place-items:center;box-shadow:0 20px 70px rgba(155,132,255,.22)}.empty-illo i{font-size:44px;color:white}.empty-state h3{color:white;margin:0 0 8px;font-size:24px;letter-spacing:-.05em}.suggestions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}.bottom-nav{position:fixed;left:12px;right:12px;bottom:12px;z-index:20;border:1px solid var(--line);border-radius:24px;background:rgba(13,16,29,.82);backdrop-filter:blur(22px);display:none;grid-template-columns:repeat(4,1fr);padding:8px;box-shadow:0 18px 70px rgba(0,0,0,.42)}.bottom-nav button{border:0;background:transparent;color:var(--muted);border-radius:17px;padding:10px 6px;display:grid;place-items:center;gap:3px;font-size:11px}.bottom-nav button.active{background:rgba(255,255,255,.09);color:white}.bottom-nav i{font-size:20px}.onboarding{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:18px;background:rgba(4,6,12,.72);backdrop-filter:blur(24px)}.onboarding.show{display:grid}.onboarding-card{width:min(760px,100%);border-radius:36px;padding:24px;position:relative;overflow:hidden}.onboarding-card:before{content:"";position:absolute;inset:-40% -20% auto;height:260px;background:radial-gradient(circle,rgba(155,132,255,.35),transparent 68%)}.onboarding-content{position:relative}.onboarding h2{font-size:clamp(34px,7vw,58px);line-height:.95;letter-spacing:-.075em;margin:14px 0}.onboarding p{color:var(--muted);line-height:1.6}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}.step{border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.06);padding:14px}.step i{font-size:24px;color:var(--cyan)}.step strong{display:block;margin:10px 0 5px}.step span{font-size:12px;color:var(--muted);line-height:1.45}.sheet{position:fixed;inset:auto 12px 12px;z-index:55;border-radius:28px;padding:18px;transform:translateY(calc(100% + 24px));transition:transform .35s var(--ease);display:none}.sheet.show{transform:translateY(0)}.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-20px);opacity:0;z-index:70;border:1px solid var(--line);border-radius:999px;background:rgba(16,19,34,.88);backdrop-filter:blur(20px);padding:11px 14px;color:white;transition:.25s var(--ease);box-shadow:0 18px 50px rgba(0,0,0,.35)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}@keyframes pulse{0%{transform:scale(.9);opacity:.7}80%,100%{transform:scale(1.15);opacity:0}}@keyframes breathe{50%{transform:scale(1.045) rotate(2deg)}}@keyframes wave{0%,100%{height:11px;opacity:.38}50%{height:38px;opacity:1}}@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-130%)}}@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@keyframes taskIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}@media (max-width:980px){.hero{grid-template-columns:1fr}.workspace-panel{min-height:auto}.main-board{grid-template-columns:1fr}.dock{position:relative;top:0;display:none}.bottom-nav{display:grid}.feature-grid{grid-template-columns:1fr}.hero-copy{margin:44px 0 26px}.stats-grid,.steps{grid-template-columns:1fr}.section-head{display:block}.tabs{margin-top:14px}.task-actions .drag-handle{display:none}}@media (max-width:560px){.app-shell{padding:10px 10px 92px}.hero-panel,.workspace-panel{border-radius:28px;padding:14px}.hero h1{font-size:48px}.topbar{align-items:flex-start}.pill-row{display:none}.orb{width:132px;height:132px}.composer{position:sticky;bottom:92px;z-index:15;background:rgba(8,10,20,.68);backdrop-filter:blur(18px);border-radius:22px;padding:6px;margin:-6px}.task{grid-template-columns:auto 1fr}.task-actions{grid-column:2;justify-content:flex-end}.onboarding-card{padding:18px;border-radius:28px}.sheet{display:block}}
 </style>
 </head>
 <body>
-<h2 class="sr-only">Hey Todo — voice-powered Notion-style to-do app. Say "Hey Todo" or tap the orb to add tasks.</h2>
-<div class="app">
-
-  <div class="topbar">
-    <div class="page-title">
-      <span class="page-icon">✦</span> hey todo
-      <span>/ personal</span>
-    </div>
-    <div class="topbar-right">
-      <span class="tag">voice</span>
-      <span class="tag">ai</span>
-    </div>
-  </div>
-
-  <div class="props">
-    <div class="prop-row">
-      <div class="prop-key"><i class="ti ti-circle-dot"></i> Status</div>
-      <div class="prop-val"><span class="status-dot" id="status-dot"></span><span id="status-text">Idle</span></div>
-    </div>
-    <div class="prop-row">
-      <div class="prop-key"><i class="ti ti-calendar"></i> Today</div>
-      <div class="prop-val" id="today-date">—</div>
-    </div>
-    <div class="prop-row">
-      <div class="prop-key"><i class="ti ti-microphone"></i> Wake word</div>
-      <div class="prop-val accent">"Hey Todo"</div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <div class="orb-section">
-    <div class="orb-container orb-idle" id="orb" onclick="toggleListen()" title="Tap to speak">
-      <div class="orb-ring"></div>
-      <div class="orb-body"><i class="ti ti-microphone" id="orb-icon"></i></div>
-    </div>
-    <div class="orb-status-wrap">
-      <div class="orb-label">voice assistant</div>
-      <div class="orb-status" id="orb-status">waiting for "hey todo"…</div>
-    </div>
-    <div class="transcript" id="transcript"></div>
-  </div>
-
-  <div class="input-row">
-    <input class="notion-input" id="manual-input" type="text" placeholder="+ add a task…" onkeydown="if(event.key==='Enter')addManual()">
-    <button class="add-btn" onclick="addManual()"><i class="ti ti-plus"></i> add</button>
-  </div>
-
-  <div class="filter-tabs">
-    <button class="ftab active" onclick="setFilter('all',this)">all</button>
-    <button class="ftab" onclick="setFilter('pending',this)">pending</button>
-    <button class="ftab" onclick="setFilter('done',this)">done</button>
-  </div>
-
-  <div class="task-meta">
-    <span class="task-count-label" id="task-count">0 tasks</span>
-    <button class="clear-btn" onclick="clearDone()">clear completed</button>
-  </div>
-
-  <div class="task-list" id="task-list"></div>
-  <div class="empty" id="empty-state">
-    <i class="ti ti-ghost"></i>
-    nothing here yet — say something!
-  </div>
-
-  <div class="hint-bar">
-    <div class="hint-title">voice commands</div>
-    <div class="hint-cmds">
-      <span class="hint-cmd">add [task name]</span>
-      <span class="hint-cmd">mark [task] done</span>
-      <span class="hint-cmd">delete [task]</span>
-      <span class="hint-cmd">complete [task]</span>
-    </div>
-  </div>
-
-</div>
-
-<script>
-const API = "https://api.anthropic.com/v1/messages";
-let tasks = [], filter = 'all', listening = false;
-let recognition = null, wakeDetect = null, idleTimer = null;
-
-// Date
-document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
-
-async function loadTasks(){
-  try{const r=await window.storage.get('heytodo_v2');if(r)tasks=JSON.parse(r.value);}catch(e){tasks=[];}
-  renderTasks();
-}
-async function saveTasks(){try{await window.storage.set('heytodo_v2',JSON.stringify(tasks));}catch(e){}}
-
-function renderTasks(){
-  const list=document.getElementById('task-list');
-  const empty=document.getElementById('empty-state');
-  const cnt=document.getElementById('task-count');
-  const visible=tasks.filter(t=>filter==='all'?true:filter==='pending'?!t.done:t.done);
-  const pending=tasks.filter(t=>!t.done).length;
-  cnt.textContent=`${tasks.length} task${tasks.length!==1?'s':''} · ${pending} pending`;
-  list.innerHTML='';
-  if(!visible.length){empty.style.display='block';return;}
-  empty.style.display='none';
-  visible.forEach(t=>{
-    const i=tasks.indexOf(t);
-    const el=document.createElement('div');
-    el.className='task-item'+(t.done?' done-item':'');
-    const d=new Date(t.created);
-    const ts=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    el.innerHTML=`
-      <div class="check-box ${t.done?'chk':''}" onclick="toggleTask(${i})">${t.done?'<i class="ti ti-check"></i>':''}</div>
-      <div class="task-body">
-        <div class="task-text">${escHtml(t.text)}</div>
-        <div class="task-footer"><span class="task-time">${ts}</span></div>
+<div class="mesh" aria-hidden="true"></div><div class="noise" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="onboarding" id="onboarding" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+  <div class="onboarding-card">
+    <div class="onboarding-content">
+      <span class="eyebrow"><i class="ti ti-sparkles"></i> Voice-first planning, now polished</span>
+      <h2 id="onboarding-title">Meet Voca.<br><span class="gradient-text">Say “Hey Todo”</span> and move on.</h2>
+      <p>Voca listens for your wake phrase, captures natural commands, extracts dates and priorities, then turns them into organized tasks. Microphone access is optional — typing always works.</p>
+      <div class="steps">
+        <div class="step"><i class="ti ti-microphone"></i><strong>1. Enable voice</strong><span>Tap the orb and allow microphone permission when your browser asks.</span></div>
+        <div class="step"><i class="ti ti-message-circle"></i><strong>2. Try saying</strong><span>“Add gym tomorrow at 6 PM” or “Remind me to study DSA.”</span></div>
+        <div class="step"><i class="ti ti-wand"></i><strong>3. Let AI sort</strong><span>Dates, recurring plans, priority, and categories are inferred locally.</span></div>
       </div>
-      <button class="task-del" onclick="deleteTask(${i})" aria-label="Delete"><i class="ti ti-x" aria-hidden="true"></i></button>`;
-    list.appendChild(el);
-  });
-}
-
-function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function toggleTask(i){tasks[i].done=!tasks[i].done;saveTasks();renderTasks();}
-function deleteTask(i){tasks.splice(i,1);saveTasks();renderTasks();}
-function clearDone(){tasks=tasks.filter(t=>!t.done);saveTasks();renderTasks();}
-function setFilter(f,btn){filter=f;document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTasks();}
-
-function addManual(){
-  const inp=document.getElementById('manual-input');
-  const text=inp.value.trim();if(!text)return;
-  tasks.unshift({text,done:false,created:Date.now()});
-  saveTasks();renderTasks();inp.value='';
-}
-
-function setOrb(state,statusText,sClass){
-  const orb=document.getElementById('orb');
-  const status=document.getElementById('orb-status');
-  const icon=document.getElementById('orb-icon');
-  const sdot=document.getElementById('status-dot');
-  const stext=document.getElementById('status-text');
-  orb.className='orb-container orb-'+state;
-  status.textContent=statusText;
-  status.className='orb-status'+(sClass?' s-'+sClass:'');
-  const icons={idle:'ti-microphone',listening:'ti-microphone',processing:'ti-loader',done:'ti-check',error:'ti-x'};
-  icon.className='ti '+(icons[state]||'ti-microphone');
-  const stateLabels={idle:'Idle',listening:'Listening',processing:'Processing',done:'Done',error:'Error'};
-  stext.textContent=stateLabels[state]||'Idle';
-  sdot.style.background=state==='listening'?'var(--accent2)':state==='processing'?'var(--amber)':state==='done'?'var(--green)':state==='error'?'var(--red)':'var(--accent)';
-}
-
-function showTranscript(t){const b=document.getElementById('transcript');b.textContent='"'+t+'"';b.className='transcript show';}
-function hideTranscript(){document.getElementById('transcript').className='transcript';}
-
-async function processVoice(transcript){
-  setOrb('processing','thinking…','processing');
-  const tl=tasks.map((t,i)=>`${i}: ${t.text} [${t.done?'done':'pending'}]`).join('\n');
-  try{
-    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,
-        system:`You parse voice to-do commands. Return ONLY raw JSON, no markdown, no explanation.
-Current tasks:\n${tl||'(none)'}
-Return one of:
-{"action":"add","task":"clean task text"}
-{"action":"complete","index":N}
-{"action":"delete","index":N}
-{"action":"unknown"}
-Match tasks fuzzily.`,
-        messages:[{role:'user',content:transcript}]})});
-    const data=await res.json();
-    const raw=data.content.find(c=>c.type==='text')?.text||'{}';
-    const cmd=JSON.parse(raw.replace(/```json|```/g,'').trim());
-    if(cmd.action==='add'&&cmd.task){
-      tasks.unshift({text:cmd.task,done:false,created:Date.now()});
-      saveTasks();renderTasks();
-      setOrb('done',`added ✓`,'done');
-    } else if(cmd.action==='complete'&&cmd.index>=0){
-      tasks[cmd.index].done=true;saveTasks();renderTasks();
-      setOrb('done','marked done ✓','done');
-    } else if(cmd.action==='delete'&&cmd.index>=0){
-      tasks.splice(cmd.index,1);saveTasks();renderTasks();
-      setOrb('done','deleted ✓','done');
-    } else {
-      setOrb('error',"didn't catch that",'error');
-    }
-  } catch(e){setOrb('error','error — try again','error');}
-  setTimeout(()=>{setOrb('idle','waiting for "hey todo"…','');hideTranscript();},2600);
-}
-
-function startListening(){
-  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){setOrb('error','speech not supported','error');return;}
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recognition=new SR();recognition.lang='en-IN';recognition.interimResults=true;
-  listening=true;setOrb('listening','listening… speak now','listening');hideTranscript();
-  clearTimeout(idleTimer);idleTimer=setTimeout(()=>{if(listening)stopListening(true);},8000);
-  recognition.onresult=(e)=>{
-    let interim='',final='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
-      else interim+=e.results[i][0].transcript;
-    }
-    showTranscript(final||interim);
-    if(final){clearTimeout(idleTimer);stopListening(false);processVoice(final.trim());}
-  };
-  recognition.onerror=()=>{stopListening(true);setOrb('error','mic error — try again','error');setTimeout(()=>setOrb('idle','waiting for "hey todo"…',''),2500);};
-  recognition.onend=()=>{if(listening)stopListening(true);};
-  recognition.start();
-}
-
-function stopListening(reset){
-  listening=false;clearTimeout(idleTimer);
-  try{if(recognition)recognition.stop();}catch(e){}
-  if(reset){setOrb('idle','waiting for "hey todo"…','');hideTranscript();}
-}
-
-function toggleListen(){if(listening)stopListening(true);else startListening();}
-
-function startWakeWord(){
-  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window))return;
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  wakeDetect=new SR();wakeDetect.continuous=true;wakeDetect.interimResults=true;wakeDetect.lang='en-IN';
-  wakeDetect.onresult=(e)=>{
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      const t=e.results[i][0].transcript.toLowerCase().replace(/[^a-z ]/g,'');
-      if(t.includes('hey todo')||t.includes('hey to do')){wakeDetect.stop();setTimeout(startListening,300);return;}
-    }
-  };
-  wakeDetect.onend=()=>{if(!listening)setTimeout(startWakeWord,500);};
-  try{wakeDetect.start();}catch(e){}
-}
-
-loadTasks().then(()=>setTimeout(startWakeWord,800));
+      <div class="hero-actions"><button class="primary" onclick="finishOnboarding()"><i class="ti ti-rocket"></i> Start planning</button><button class="secondary" onclick="demoCommand('Add gym tomorrow at 6 PM')"><i class="ti ti-player-play"></i> Run sample</button></div>
+    </div>
+  </div>
+</div>
+<main class="app-shell">
+  <section class="hero" aria-label="Voca voice task manager">
+    <div class="hero-panel">
+      <div class="topbar">
+        <div class="brand"><div class="logo" aria-hidden="true"><i class="ti ti-wave-sine"></i></div><div class="brand-copy"><strong>Voca</strong><span>formerly Hey Todo</span></div></div>
+        <div class="pill-row"><span class="pill"><i class="ti ti-bolt"></i> PWA ready</span><span class="pill"><i class="ti ti-accessible"></i> Accessible</span><span class="pill"><i class="ti ti-wifi-off"></i> Offline</span></div>
+      </div>
+      <div class="hero-copy">
+        <span class="eyebrow"><i class="ti ti-circle-dot"></i> Wake phrase: “Hey Todo”</span>
+        <h1>Capture tasks at the <span class="gradient-text">speed of thought.</span></h1>
+        <p>A modern AI-productivity cockpit with voice capture, smart parsing, satisfying completion, streaks, and native-feeling mobile gestures.</p>
+        <div class="hero-actions"><button class="primary" onclick="startListening()"><i class="ti ti-microphone"></i> Try voice capture</button><button class="secondary" onclick="openOnboarding()"><i class="ti ti-school"></i> View tutorial</button></div>
+      </div>
+      <div class="feature-grid">
+        <article class="feature"><i class="ti ti-wave-saw-tool"></i><strong>Live voice feedback</strong><span>Waveform, transcript, thinking, success, and error states make the assistant feel alive.</span></article>
+        <article class="feature"><i class="ti ti-calendar-time"></i><strong>Natural parsing</strong><span>Detects dates, times, recurring phrases, categories, and priorities from plain speech.</span></article>
+        <article class="feature"><i class="ti ti-gesture-swipe"></i><strong>Mobile gestures</strong><span>Swipe right to complete, swipe left to delete, with bottom navigation for thumbs.</span></article>
+      </div>
+    </div>
+    <aside class="workspace-panel" aria-label="Task workspace">
+      <section class="assistant-card">
+        <div class="assistant-top"><div><h2>Voice assistant</h2><p id="permission-text">Tap the orb or say “Hey Todo”.</p></div><button class="icon-btn" onclick="startWakeWord()" aria-label="Start wake word listener"><i class="ti ti-radar"></i></button></div>
+        <button class="voice-stage idle" id="voice-stage" onclick="toggleListen()" aria-label="Toggle voice listening">
+          <div class="orb"><i class="ti ti-microphone" id="orb-icon"></i></div>
+          <div class="waveform" aria-hidden="true"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+        </button>
+        <div class="voice-copy"><strong id="voice-title">Ready when you are</strong><span id="voice-subtitle">Try: “Add gym tomorrow at 6 PM”</span></div>
+        <div class="transcript" id="transcript">Live transcription appears here.</div>
+        <div class="status-rail" aria-label="Voice status"><span class="status-chip active" data-state="idle">idle</span><span class="status-chip" data-state="listening">listening</span><span class="status-chip" data-state="thinking">thinking</span><span class="status-chip" data-state="completed">done</span><span class="status-chip" data-state="error">error</span></div>
+        <div class="command-carousel" aria-label="Example commands"><span class="command">Try saying “Add gym tomorrow at 6 PM”</span><span class="command">“Remind me to study DSA”</span><span class="command">“Delete my shopping task”</span><span class="command">“Call mom tonight high priority”</span></div>
+      </section>
+      <form class="composer" onsubmit="event.preventDefault();addManual();"><input id="manual-input" autocomplete="off" placeholder="Ask Voca to add, complete, or delete…"><button class="add-btn" type="submit"><i class="ti ti-plus"></i> Add</button></form>
+      <section class="stats-grid" aria-label="Productivity stats"><div class="stat"><span>Today</span><strong id="stat-today">0</strong></div><div class="stat"><span>Streak</span><strong id="stat-streak">0d</strong></div><div class="stat" style="display:flex;align-items:center;justify-content:space-between"><div><span>Progress</span><strong id="stat-progress">0%</strong></div><div class="progress-ring" id="progress-ring" data-label="0%"></div></div></section>
+      <section class="insight-card"><i class="ti ti-sparkles"></i><div><strong>AI productivity insight</strong><p id="insight-text">Add a few tasks and Voca will suggest focus blocks and smart groups.</p></div></section>
+    </aside>
+  </section>
+  <section class="main-board" id="tasks">
+    <nav class="dock" aria-label="Task views"><button class="nav-btn active" onclick="setView('today',this)"><i class="ti ti-sun"></i> Today <span class="count" id="count-today">0</span></button><button class="nav-btn" onclick="setView('upcoming',this)"><i class="ti ti-calendar"></i> Upcoming <span class="count" id="count-upcoming">0</span></button><button class="nav-btn" onclick="setView('ai',this)"><i class="ti ti-sparkles"></i> AI Suggested <span class="count" id="count-ai">0</span></button><button class="nav-btn" onclick="setView('completed',this)"><i class="ti ti-circle-check"></i> Completed <span class="count" id="count-completed">0</span></button><div class="quick-stack"><button class="quick-btn" onclick="demoCommand('Deep work sprint tomorrow 9 AM high priority')">+ Deep work sprint</button><button class="quick-btn" onclick="demoCommand('Study AI every Monday')">+ Recurring study</button><button class="quick-btn" onclick="clearCompleted()">Clear completed</button></div></nav>
+    <div class="task-surface">
+      <div class="section-head"><div><h2 id="view-title">Today</h2><p id="view-subtitle">Your voice-built plan, grouped by urgency and intent.</p></div><div class="tabs"><button class="tab active" onclick="setFilter('all',this)">All</button><button class="tab" onclick="setFilter('high',this)">High priority</button><button class="tab" onclick="setFilter('work',this)">Work</button><button class="tab" onclick="setFilter('personal',this)">Personal</button></div></div>
+      <div class="task-list" id="task-list" aria-live="polite"></div>
+      <div class="empty-state" id="empty-state"><div class="empty-illo"><i class="ti ti-planet"></i></div><h3>No blank screens here.</h3><p>Start with a sample or say “Hey Todo” to capture your next thing.</p><div class="suggestions"><button class="secondary" onclick="demoCommand('Add gym tomorrow at 6 PM')">Gym tomorrow</button><button class="secondary" onclick="demoCommand('Remind me to study DSA')">Study DSA</button><button class="secondary" onclick="startListening()">Use voice</button></div></div>
+    </div>
+  </section>
+</main>
+<nav class="bottom-nav" aria-label="Mobile task navigation"><button class="active" onclick="setViewMobile('today',this)"><i class="ti ti-sun"></i><span>Today</span></button><button onclick="setViewMobile('upcoming',this)"><i class="ti ti-calendar"></i><span>Next</span></button><button onclick="setViewMobile('ai',this)"><i class="ti ti-sparkles"></i><span>AI</span></button><button onclick="setViewMobile('completed',this)"><i class="ti ti-check"></i><span>Done</span></button></nav>
+<script>
+const WAKE_PHRASE='hey todo';
+const STORAGE_KEY='voca_tasks_v1';
+const ONBOARDING_KEY='voca_onboarded_v1';
+let tasks=[];let view='today';let filter='all';let listening=false;let recognition=null;let wakeDetect=null;let idleTimer=null;let dragId=null;
+const $=s=>document.querySelector(s);const $$=s=>Array.from(document.querySelectorAll(s));
+const examples=['Add gym tomorrow at 6 PM','Remind me to study DSA','Delete my shopping task','Call mom tonight high priority','Study AI every Monday'];
+function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function todayISO(offset=0){const d=new Date();d.setDate(d.getDate()+offset);return d.toISOString().slice(0,10)}
+function loadTasks(){try{tasks=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){tasks=[]}if(!tasks.length){tasks=[makeTask('Review Voca onboarding', {category:'work', priority:'medium', due:todayISO(), source:'seed'}),makeTask('Say Hey Todo and add a real task',{category:'personal',priority:'high',due:todayISO(),source:'seed'}),makeTask('Plan weekly focus block',{category:'work',priority:'low',due:todayISO(2),source:'seed'})];saveTasks()}}
+function saveTasks(){localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks))}
+function makeTask(text, extra={}){const parsed=parseNaturalLanguage(text);return {id:uid(),text:parsed.cleanText||text,done:false,created:Date.now(),completedAt:null,category:parsed.category,priority:parsed.priority,due:parsed.due,time:parsed.time,recurring:parsed.recurring,aiSuggested:parsed.aiSuggested,...extra}}
+function parseNaturalLanguage(raw){let text=raw.trim();const lower=text.toLowerCase();let due=null,time=null,recurring=null,priority='medium',category='personal';if(/high priority|urgent|asap|important/.test(lower))priority='high';else if(/low priority|someday|minor/.test(lower))priority='low';if(/work|meeting|client|email|deploy|sprint|review|project|deep work/.test(lower))category='work';if(/study|dsa|ai|learn|read|course/.test(lower))category='learning';if(/gym|mom|shopping|groceries|call|home|family/.test(lower))category='personal';if(/today|tonight/.test(lower))due=todayISO();if(/tomorrow/.test(lower))due=todayISO(1);const weekday=lower.match(/every (monday|tuesday|wednesday|thursday|friday|saturday|sunday)/);if(weekday){recurring='Every '+weekday[1][0].toUpperCase()+weekday[1].slice(1);due=nextWeekday(weekday[1])}const timeMatch=lower.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm|a\.m\.|p\.m\.)/);if(timeMatch){let h=Number(timeMatch[1]);const m=timeMatch[2]||'00';const mer=timeMatch[3][0];if(mer==='p'&&h<12)h+=12;if(mer==='a'&&h===12)h=0;time=String(h).padStart(2,'0')+':'+m}text=text.replace(/\b(add|remind me to|remind me|please|hey todo|voca)\b/ig,'').replace(/\b(today|tomorrow|tonight|high priority|low priority|urgent|asap|important)\b/ig,'').replace(/\bat\s+\d{1,2}(:\d{2})?\s*(am|pm|a\.m\.|p\.m\.)/ig,'').replace(/\bevery\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)/ig,'').replace(/\s+/g,' ').trim();return{cleanText:text,priority,category,due,time,recurring,aiSuggested:/suggest|maybe|should/.test(lower)}}
+function nextWeekday(day){const days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];const now=new Date();const target=days.indexOf(day);let delta=(target-now.getDay()+7)%7||7;return todayISO(delta)}
+function render(){const list=$('#task-list');const visible=getVisibleTasks();list.innerHTML='';visible.forEach((t,i)=>list.appendChild(taskEl(t,i)));$('#empty-state').classList.toggle('show',visible.length===0);updateStats();updateCounts();updateInsight()}
+function getVisibleTasks(){let items=[...tasks];if(view==='today')items=items.filter(t=>!t.done&&(t.due===todayISO()||!t.due));if(view==='upcoming')items=items.filter(t=>!t.done&&t.due&&t.due!==todayISO());if(view==='completed')items=items.filter(t=>t.done);if(view==='ai')items=items.filter(t=>!t.done&&(t.aiSuggested||t.priority==='high'||t.recurring));if(filter==='high')items=items.filter(t=>t.priority==='high');if(filter==='work')items=items.filter(t=>t.category==='work'||t.category==='learning');if(filter==='personal')items=items.filter(t=>t.category==='personal');return items.sort((a,b)=>(a.done-b.done)||priorityScore(b.priority)-priorityScore(a.priority)||(a.due||'').localeCompare(b.due||''))}
+function priorityScore(p){return p==='high'?3:p==='medium'?2:1}
+function taskEl(t,i){const el=document.createElement('article');el.className='task'+(t.done?' done':'');el.draggable=true;el.dataset.id=t.id;el.innerHTML=`<button class="check" onclick="toggleTask('${t.id}')" aria-label="Toggle ${escapeHtml(t.text)}">${t.done?'<i class="ti ti-check"></i>':''}</button><div><div class="task-title">${escapeHtml(t.text)}</div><div class="task-meta"><span class="badge ${t.priority}"><i class="ti ti-flag"></i>${t.priority}</span><span class="badge"><i class="ti ti-folder"></i>${escapeHtml(t.category)}</span>${t.due?`<span class="badge"><i class="ti ti-calendar"></i>${formatDue(t.due,t.time)}</span>`:''}${t.recurring?`<span class="badge"><i class="ti ti-repeat"></i>${escapeHtml(t.recurring)}</span>`:''}</div></div><div class="task-actions"><button class="task-action drag-handle" aria-label="Drag task"><i class="ti ti-grip-vertical"></i></button><button class="task-action" onclick="deleteTask('${t.id}')" aria-label="Delete task"><i class="ti ti-trash"></i></button></div>`;wireDrag(el);wireSwipe(el,t.id);return el}
+function formatDue(d,t){const label=d===todayISO()?'Today':d===todayISO(1)?'Tomorrow':new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});return t?`${label} ${t}`:label}
+function updateStats(){const today=tasks.filter(t=>t.due===todayISO()&&!t.done).length;const done=tasks.filter(t=>t.done).length;const pct=tasks.length?Math.round(done/tasks.length*100):0;$('#stat-today').textContent=today;$('#stat-streak').textContent=calcStreak()+'d';$('#stat-progress').textContent=pct+'%';$('#progress-ring').style.setProperty('--p',pct);$('#progress-ring').dataset.label=pct+'%'}
+function updateCounts(){$('#count-today').textContent=tasks.filter(t=>!t.done&&(t.due===todayISO()||!t.due)).length;$('#count-upcoming').textContent=tasks.filter(t=>!t.done&&t.due&&t.due!==todayISO()).length;$('#count-ai').textContent=tasks.filter(t=>!t.done&&(t.aiSuggested||t.priority==='high'||t.recurring)).length;$('#count-completed').textContent=tasks.filter(t=>t.done).length}
+function updateInsight(){const high=tasks.filter(t=>!t.done&&t.priority==='high').length;const recurring=tasks.filter(t=>!t.done&&t.recurring).length;const next=tasks.find(t=>!t.done&&t.due);$('#insight-text').textContent=high?`You have ${high} high-priority item${high>1?'s':''}. Start with the smallest one to build momentum.`:recurring?`Recurring work detected. Voca will keep it visible in AI Suggested.`:next?`Next focus: ${next.text}. A 25-minute block would be a good fit.`:'Your workspace is clear. Capture a tiny next action to maintain your streak.'}
+function calcStreak(){const dates=new Set(tasks.filter(t=>t.done&&t.completedAt).map(t=>new Date(t.completedAt).toISOString().slice(0,10)));let streak=0;for(let i=0;i<30;i++){if(dates.has(todayISO(-i)))streak++;else if(i>0)break}return streak}
+function addManual(){const input=$('#manual-input');const text=input.value.trim();if(!text)return;handleCommand(text);input.value=''}
+function handleCommand(text){setVoiceState('thinking','Parsing command','Extracting task details…');setTimeout(()=>{const lower=text.toLowerCase();if(/^(delete|remove)\b/.test(lower)){const target=lower.replace(/^(delete|remove)\s+(my\s+)?/,'').replace(/task$/,'').trim();const found=findTask(target);if(found)return deleteTask(found.id,true);return voiceError('No matching task found')}if(/^(complete|finish|mark)\b/.test(lower)){const target=lower.replace(/^(complete|finish|mark)\s+(my\s+)?/,'').replace(/done$/,'').trim();const found=findTask(target);if(found)return toggleTask(found.id,true);return voiceError('No matching task found')}const task=makeTask(text);tasks.unshift(task);saveTasks();render();setVoiceState('completed','Task captured','Added “'+task.text+'”');toast('Added task');setTimeout(()=>setVoiceState('idle','Ready when you are','Try: “Add gym tomorrow at 6 PM”'),1600)},450)}
+function findTask(target){return tasks.find(t=>t.text.toLowerCase().includes(target)||target.includes(t.text.toLowerCase()))}
+function toggleTask(id,fromVoice=false){const t=tasks.find(x=>x.id===id);if(!t)return;t.done=!t.done;t.completedAt=t.done?Date.now():null;saveTasks();render();toast(t.done?'Completed ✓':'Reopened');if(fromVoice){setVoiceState('completed','Completed','Nice momentum.');setTimeout(()=>setVoiceState('idle','Ready when you are','Try another command'),1600)}}
+function deleteTask(id,fromVoice=false){tasks=tasks.filter(t=>t.id!==id);saveTasks();render();toast('Deleted task');if(fromVoice){setVoiceState('completed','Deleted','Task removed.');setTimeout(()=>setVoiceState('idle','Ready when you are','Try another command'),1600)}}
+function clearCompleted(){tasks=tasks.filter(t=>!t.done);saveTasks();render();toast('Completed tasks cleared')}
+function setView(v,btn){view=v;$$('.nav-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');$$('.bottom-nav button').forEach((b,idx)=>b.classList.toggle('active',['today','upcoming','ai','completed'][idx]===v));$('#view-title').textContent={today:'Today',upcoming:'Upcoming',ai:'AI Suggested',completed:'Completed'}[v];$('#view-subtitle').textContent={today:'Your immediate plan, captured by voice or keyboard.',upcoming:'Everything scheduled beyond today.',ai:'High-priority, recurring, and assistant-worthy work.',completed:'A satisfying archive of finished momentum.'}[v];render();document.getElementById('tasks').scrollIntoView({behavior:'smooth',block:'start'})}
+function setViewMobile(v,btn){setView(v);$$('.bottom-nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+function setFilter(f,btn){filter=f;$$('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render()}
+function setVoiceState(state,title,subtitle){const stage=$('#voice-stage');stage.className='voice-stage '+state;$('#voice-title').textContent=title;$('#voice-subtitle').textContent=subtitle;$('#orb-icon').className='ti '+({idle:'ti-microphone',listening:'ti-microphone',thinking:'ti-loader-2',completed:'ti-check',error:'ti-alert-triangle'}[state]||'ti-microphone');$$('.status-chip').forEach(c=>c.classList.toggle('active',c.dataset.state===state));}
+function showTranscript(t){$('#transcript').textContent=t?'“'+t+'”':'Live transcription appears here.'}
+function voiceError(msg){setVoiceState('error','Something went sideways',msg);toast(msg);setTimeout(()=>setVoiceState('idle','Ready when you are','Try a simpler command'),1900)}
+function startListening(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){voiceError('Speech recognition is not supported in this browser. Type a command instead.');$('#permission-text').textContent='Voice unavailable — keyboard fallback ready.';return}try{if(wakeDetect)wakeDetect.stop()}catch(e){}recognition=new SR();recognition.lang='en-US';recognition.interimResults=true;recognition.continuous=false;listening=true;showTranscript('');setVoiceState('listening','Listening…','Speak naturally. Voca will parse the rest.');clearTimeout(idleTimer);idleTimer=setTimeout(()=>stopListening(true),9000);recognition.onresult=e=>{let interim='',final='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript}showTranscript(final||interim);if(final){stopListening(false);handleCommand(final.trim())}};recognition.onerror=e=>{stopListening(false);voiceError(e.error==='not-allowed'?'Microphone permission denied. Use typing or allow mic access.':'Microphone error. Please retry.')};recognition.onend=()=>{if(listening)stopListening(true)};try{recognition.start();$('#permission-text').textContent='Microphone active.'}catch(e){voiceError('Could not start microphone. Please retry.')}}
+function stopListening(reset){listening=false;clearTimeout(idleTimer);try{if(recognition)recognition.stop()}catch(e){}if(reset){setVoiceState('idle','Ready when you are','Try: “Add gym tomorrow at 6 PM”');showTranscript('')}}
+function toggleListen(){listening?stopListening(true):startListening()}
+function startWakeWord(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){voiceError('Wake word requires Chrome or Edge speech recognition.');return}try{if(wakeDetect)wakeDetect.stop()}catch(e){}wakeDetect=new SR();wakeDetect.continuous=true;wakeDetect.interimResults=true;wakeDetect.lang='en-US';setVoiceState('idle','Wake word armed','Say “Hey Todo” to begin.');$('#permission-text').textContent='Wake phrase listener armed.';wakeDetect.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript.toLowerCase().replace(/[^a-z ]/g,'');if(t.includes(WAKE_PHRASE)||t.includes('hey to do')){try{wakeDetect.stop()}catch(err){}setTimeout(startListening,250);return}}};wakeDetect.onend=()=>{if(!listening)setTimeout(()=>{try{wakeDetect.start()}catch(e){}},900)};try{wakeDetect.start();toast('Wake word armed')}catch(e){voiceError('Wake listener already running or blocked.')}}
+function demoCommand(cmd){finishOnboarding(false);showTranscript(cmd);handleCommand(cmd)}
+function openOnboarding(){$('#onboarding').classList.add('show')}
+function finishOnboarding(mark=true){if(mark)localStorage.setItem(ONBOARDING_KEY,'1');$('#onboarding').classList.remove('show')}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),1900)}
+function wireDrag(el){el.addEventListener('dragstart',()=>{dragId=el.dataset.id;el.classList.add('dragging')});el.addEventListener('dragend',()=>el.classList.remove('dragging'));el.addEventListener('dragover',e=>e.preventDefault());el.addEventListener('drop',e=>{e.preventDefault();const targetId=el.dataset.id;if(!dragId||dragId===targetId)return;const from=tasks.findIndex(t=>t.id===dragId);const to=tasks.findIndex(t=>t.id===targetId);const [moved]=tasks.splice(from,1);tasks.splice(to,0,moved);saveTasks();render();toast('Tasks reordered')})}
+function wireSwipe(el,id){let startX=0;let current=0;el.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});el.addEventListener('touchmove',e=>{current=e.touches[0].clientX-startX;if(Math.abs(current)>12)el.style.transform=`translateX(${Math.max(-92,Math.min(92,current))}px)`},{passive:true});el.addEventListener('touchend',()=>{if(current>72)toggleTask(id);else if(current<-72)deleteTask(id);el.style.transform='';current=0})}
+function registerServiceWorker(){if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}}
+loadTasks();render();registerServiceWorker();if(!localStorage.getItem(ONBOARDING_KEY))setTimeout(openOnboarding,500);window.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){$('#manual-input').focus();e.preventDefault()}if(e.key==='Escape')finishOnboarding(false)});
 </script>
 </body>
 </html>
