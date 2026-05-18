@@ -15,6 +15,13 @@ const requiredSnippets = [
   'class="bottom-nav"',
   'manifest.webmanifest',
   'navigator.serviceWorker.register',
+
+  'Collaborative Productivity Messenger',
+  'function renderCollaboration()',
+  'function sendMessage()',
+  'function addSharedTask()',
+  'REALTIME_CONFIG',
+  'Supabase realtime ready',
 ];
 
 for (const snippet of requiredSnippets) {
