@@ -2,8 +2,10 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
+loadLocalEnv(path.join(ROOT, '.env'));
+
+const PORT = Number(process.env.PORT || 4173);
 const GEMINI_MODEL = 'gemini-2.5-flash';
 const MAX_BODY_BYTES = 1024 * 1024;
 const ALLOWED_ACTIONS = new Set([
@@ -16,6 +18,25 @@ const ALLOWED_ACTIONS = new Set([
 ]);
 const PRIORITIES = new Set(['low', 'medium', 'high']);
 const STATUSES = new Set(['todo', 'in_progress', 'done', 'blocked']);
+
+
+function loadLocalEnv(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  const lines = fs.readFileSync(filePath, 'utf8').split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
+    const separatorIndex = trimmed.indexOf('=');
+    const key = trimmed.slice(0, separatorIndex).trim();
+    let value = trimmed.slice(separatorIndex + 1).trim();
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key) || process.env[key] !== undefined) continue;
+    const quote = value[0];
+    if ((quote === '"' || quote === "'") && value.endsWith(quote)) {
+      value = value.slice(1, -1);
+    }
+    process.env[key] = value;
+  }
+}
 
 function sendJson(res, status, payload) {
   res.writeHead(status, {

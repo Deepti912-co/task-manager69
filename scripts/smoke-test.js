@@ -4,6 +4,8 @@ const html = fs.readFileSync('index.html', 'utf8');
 const manifest = fs.readFileSync('manifest.webmanifest', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 const server = fs.readFileSync('server.js', 'utf8');
+const gitignore = fs.readFileSync('.gitignore', 'utf8');
+const envExample = fs.readFileSync('.env.example', 'utf8');
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
 const requiredSnippets = [
@@ -38,6 +40,14 @@ for (const snippet of requiredSnippets) {
 
 if (!server.includes("gemini-2.5-flash") || !server.includes("/api/gemini/actions")) {
   throw new Error('Server should expose the Gemini action extraction endpoint.');
+}
+
+if (!server.includes("loadLocalEnv(path.join(ROOT, '.env'))") || !server.includes('process.env.GEMINI_API_KEY')) {
+  throw new Error('Server should load Gemini credentials from a local .env file.');
+}
+
+if (!gitignore.includes('.env') || !envExample.includes('GEMINI_API_KEY=your_gemini_api_key_here')) {
+  throw new Error('Gemini API key setup should be documented without committing secrets.');
 }
 
 if (pkg.scripts.start !== 'node server.js') {
