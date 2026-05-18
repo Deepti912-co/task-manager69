@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#191919;--bg2:#202020;--bg3:#252525;--bg4:#2f2f2f;
+  --border:#333;--border2:#3d3d3d;
+  --text:#e8e8e3;--text2:#9b9b97;--text3:#6b6b68;
+  --accent:#7c6af7;--accent2:#9b8bf9;--accent-glow:rgba(124,106,247,0.18);
+  --green:#5fb863;--green-glow:rgba(95,184,99,0.18);
+  --amber:#e8a628;--amber-glow:rgba(232,166,40,0.18);
+  --red:#e06c6c;--red-glow:rgba(224,108,108,0.15);
+  --pink:#e878b0;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* Layout */
+.app{max-width:560px;margin:0 auto;padding:32px 20px 60px}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.page-icon{font-size:22px;margin-right:8px}
+.page-title{font-size:22px;font-weight:600;color:var(--text);letter-spacing:-0.3px;display:flex;align-items:center;gap:2px}
+.page-title span{color:var(--text2);font-weight:400;font-size:13px;margin-left:8px;margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.tag{font-size:11px;padding:3px 9px;border-radius:20px;border:0.5px solid var(--border2);color:var(--text3);background:var(--bg3);font-weight:500;letter-spacing:0.2px}
+
+/* Properties block */
+.props{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:24px;display:flex;flex-direction:column;gap:10px}
+.prop-row{display:flex;align-items:center;gap:0;font-size:13px}
+.prop-key{color:var(--text3);width:110px;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.prop-key i{font-size:14px}
+.prop-val{color:var(--text2)}
+.prop-val.accent{color:var(--accent2)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:7px;animation:dot-pulse 2s ease-in-out infinite}
+@keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* Divider */
+.divider{height:0.5px;background:var(--border);margin:20px 0}
+
+/* Orb section */
+.orb-section{display:flex;flex-direction:column;align-items:center;margin-bottom:28px;gap:14px}
+.orb-container{position:relative;width:96px;height:96px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.orb-ring{position:absolute;inset:0;border-radius:50%;border:0.5px solid transparent;transition:all 0.4s}
+.orb-body{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.4s;position:relative;z-index:1}
+.orb-body i{font-size:26px;color:white;transition:all 0.3s}
+
+/* Idle */
+.orb-idle .orb-ring{border-color:var(--border2);box-shadow:0 0 0 0 transparent}
+.orb-idle .orb-body{background:var(--bg4);box-shadow:0 0 0 0 transparent}
+.orb-idle .orb-body i{color:var(--text3)}
+
+/* Listening */
+.orb-listening .orb-ring{border-color:var(--accent);box-shadow:0 0 20px var(--accent-glow),0 0 40px var(--accent-glow);animation:ring-pulse 1s ease-in-out infinite}
+.orb-listening .orb-body{background:linear-gradient(135deg,#7c6af7,#9b8bf9);box-shadow:0 0 24px var(--accent-glow)}
+.orb-listening .orb-body i{animation:mic-bounce 0.6s ease-in-out infinite}
+
+/* Processing */
+.orb-processing .orb-ring{border-color:var(--amber);box-shadow:0 0 16px var(--amber-glow);animation:ring-spin 1.5s linear infinite}
+.orb-processing .orb-body{background:linear-gradient(135deg,#e8a628,#c98c1a);box-shadow:0 0 20px var(--amber-glow)}
+.orb-processing .orb-body i{animation:spin 1s linear infinite}
+
+/* Done */
+.orb-done .orb-ring{border-color:var(--green);box-shadow:0 0 20px var(--green-glow)}
+.orb-done .orb-body{background:linear-gradient(135deg,#5fb863,#4a9e4e);box-shadow:0 0 24px var(--green-glow);animation:pop 0.35s ease-out}
+
+/* Error */
+.orb-error .orb-ring{border-color:var(--red)}
+.orb-error .orb-body{background:linear-gradient(135deg,#e06c6c,#c45252)}
+
+@keyframes ring-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes ring-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes mic-bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:scale(0.8)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+
+.orb-status-wrap{text-align:center}
+.orb-label{font-size:12px;font-weight:500;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px}
+.orb-status{font-size:13px;color:var(--text2);min-height:18px}
+.orb-status.s-listening{color:var(--accent2)}
+.orb-status.s-processing{color:var(--amber)}
+.orb-status.s-done{color:var(--green)}
+.orb-status.s-error{color:var(--red)}
+
+/* Transcript */
+.transcript{font-size:13px;color:var(--text3);background:var(--bg3);border:0.5px dashed var(--border2);border-radius:var(--radius);padding:8px 14px;text-align:center;font-style:italic;display:none;max-width:360px}
+.transcript.show{display:block}
+
+/* Input row */
+.input-row{display:flex;gap:8px;margin-bottom:24px;align-items:center}
+.notion-input{flex:1;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:9px 13px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.notion-input::placeholder{color:var(--text3)}
+.notion-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+.add-btn{background:var(--accent);border:none;border-radius:var(--radius);padding:9px 14px;color:white;font-size:13px;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:opacity 0.15s,transform 0.1s}
+.add-btn:hover{opacity:0.88}
+.add-btn:active{transform:scale(0.97)}
+
+/* Filter tabs */
+.filter-tabs{display:flex;gap:4px;margin-bottom:16px}
+.ftab{font-size:12px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--border);color:var(--text3);background:transparent;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
+.ftab:hover{border-color:var(--border2);color:var(--text2)}
+.ftab.active{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+.task-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.task-count-label{font-size:12px;color:var(--text3)}
+.clear-btn{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:0;transition:color 0.15s}
+.clear-btn:hover{color:var(--text2)}
+
+/* Tasks */
+.task-list{display:flex;flex-direction:column;gap:1px}
+.task-item{background:var(--bg);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px;animation:fadeSlide 0.22s ease-out;transition:background 0.15s;border:0.5px solid transparent}
+.task-item:hover{background:var(--bg2);border-color:var(--border)}
+.task-item.done-item{opacity:0.45}
+@keyframes fadeSlide{from{transform:translateY(-6px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.check-box{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s}
+.check-box:hover{border-color:var(--accent)}
+.check-box.chk{background:var(--accent);border-color:var(--accent)}
+.check-box.chk i{color:white;font-size:11px}
+
+.task-body{flex:1;min-width:0}
+.task-text{font-size:14px;color:var(--text);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task-item.done-item .task-text{text-decoration:line-through}
+.task-footer{display:flex;align-items:center;gap:8px;margin-top:2px}
+.task-time{font-size:11px;color:var(--text3)}
+
+.task-del{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:4px;display:flex;align-items:center;opacity:0;transition:opacity 0.15s,color 0.15s}
+.task-item:hover .task-del{opacity:1}
+.task-del:hover{color:var(--red)}
+
+.empty{text-align:center;padding:40px 0 20px;color:var(--text3);font-size:13px}
+.empty i{font-size:28px;display:block;margin-bottom:8px;opacity:0.4}
+
+/* Hint */
+.hint-bar{margin-top:24px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px}
+.hint-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.hint-cmds{display:flex;flex-wrap:wrap;gap:6px}
+.hint-cmd{font-size:11px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;padding:4px 10px;color:var(--text2);font-family:'Inter',sans-serif}
+</style>
+</head>
+<body>
+<h2 class="sr-only">Hey Todo — voice-powered Notion-style to-do app. Say "Hey Todo" or tap the orb to add tasks.</h2>
+<div class="app">
+
+  <div class="topbar">
+    <div class="page-title">
+      <span class="page-icon">✦</span> hey todo
+      <span>/ personal</span>
+    </div>
+    <div class="topbar-right">
+      <span class="tag">voice</span>
+      <span class="tag">ai</span>
+    </div>
+  </div>
+
+  <div class="props">
+    <div class="prop-row">
+      <div class="prop-key"><i class="ti ti-circle-dot"></i> Status</div>
+      <div class="prop-val"><span class="status-dot" id="status-dot"></span><span id="status-text">Idle</span></div>
+    </div>
+    <div class="prop-row">
+      <div class="prop-key"><i class="ti ti-calendar"></i> Today</div>
+      <div class="prop-val" id="today-date">—</div>
+    </div>
+    <div class="prop-row">
+      <div class="prop-key"><i class="ti ti-microphone"></i> Wake word</div>
+      <div class="prop-val accent">"Hey Todo"</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="orb-section">
+    <div class="orb-container orb-idle" id="orb" onclick="toggleListen()" title="Tap to speak">
+      <div class="orb-ring"></div>
+      <div class="orb-body"><i class="ti ti-microphone" id="orb-icon"></i></div>
+    </div>
+    <div class="orb-status-wrap">
+      <div class="orb-label">voice assistant</div>
+      <div class="orb-status" id="orb-status">waiting for "hey todo"…</div>
+    </div>
+    <div class="transcript" id="transcript"></div>
+  </div>
+
+  <div class="input-row">
+    <input class="notion-input" id="manual-input" type="text" placeholder="+ add a task…" onkeydown="if(event.key==='Enter')addManual()">
+    <button class="add-btn" onclick="addManual()"><i class="ti ti-plus"></i> add</button>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="ftab active" onclick="setFilter('all',this)">all</button>
+    <button class="ftab" onclick="setFilter('pending',this)">pending</button>
+    <button class="ftab" onclick="setFilter('done',this)">done</button>
+  </div>
+
+  <div class="task-meta">
+    <span class="task-count-label" id="task-count">0 tasks</span>
+    <button class="clear-btn" onclick="clearDone()">clear completed</button>
+  </div>
+
+  <div class="task-list" id="task-list"></div>
+  <div class="empty" id="empty-state">
+    <i class="ti ti-ghost"></i>
+    nothing here yet — say something!
+  </div>
+
+  <div class="hint-bar">
+    <div class="hint-title">voice commands</div>
+    <div class="hint-cmds">
+      <span class="hint-cmd">add [task name]</span>
+      <span class="hint-cmd">mark [task] done</span>
+      <span class="hint-cmd">delete [task]</span>
+      <span class="hint-cmd">complete [task]</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "https://api.anthropic.com/v1/messages";
+let tasks = [], filter = 'all', listening = false;
+let recognition = null, wakeDetect = null, idleTimer = null;
+
+// Date
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+
+async function loadTasks(){
+  try{const r=await window.storage.get('heytodo_v2');if(r)tasks=JSON.parse(r.value);}catch(e){tasks=[];}
+  renderTasks();
+}
+async function saveTasks(){try{await window.storage.set('heytodo_v2',JSON.stringify(tasks));}catch(e){}}
+
+function renderTasks(){
+  const list=document.getElementById('task-list');
+  const empty=document.getElementById('empty-state');
+  const cnt=document.getElementById('task-count');
+  const visible=tasks.filter(t=>filter==='all'?true:filter==='pending'?!t.done:t.done);
+  const pending=tasks.filter(t=>!t.done).length;
+  cnt.textContent=`${tasks.length} task${tasks.length!==1?'s':''} · ${pending} pending`;
+  list.innerHTML='';
+  if(!visible.length){empty.style.display='block';return;}
+  empty.style.display='none';
+  visible.forEach(t=>{
+    const i=tasks.indexOf(t);
+    const el=document.createElement('div');
+    el.className='task-item'+(t.done?' done-item':'');
+    const d=new Date(t.created);
+    const ts=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    el.innerHTML=`
+      <div class="check-box ${t.done?'chk':''}" onclick="toggleTask(${i})">${t.done?'<i class="ti ti-check"></i>':''}</div>
+      <div class="task-body">
+        <div class="task-text">${escHtml(t.text)}</div>
+        <div class="task-footer"><span class="task-time">${ts}</span></div>
+      </div>
+      <button class="task-del" onclick="deleteTask(${i})" aria-label="Delete"><i class="ti ti-x" aria-hidden="true"></i></button>`;
+    list.appendChild(el);
+  });
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toggleTask(i){tasks[i].done=!tasks[i].done;saveTasks();renderTasks();}
+function deleteTask(i){tasks.splice(i,1);saveTasks();renderTasks();}
+function clearDone(){tasks=tasks.filter(t=>!t.done);saveTasks();renderTasks();}
+function setFilter(f,btn){filter=f;document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTasks();}
+
+function addManual(){
+  const inp=document.getElementById('manual-input');
+  const text=inp.value.trim();if(!text)return;
+  tasks.unshift({text,done:false,created:Date.now()});
+  saveTasks();renderTasks();inp.value='';
+}
+
+function setOrb(state,statusText,sClass){
+  const orb=document.getElementById('orb');
+  const status=document.getElementById('orb-status');
+  const icon=document.getElementById('orb-icon');
+  const sdot=document.getElementById('status-dot');
+  const stext=document.getElementById('status-text');
+  orb.className='orb-container orb-'+state;
+  status.textContent=statusText;
+  status.className='orb-status'+(sClass?' s-'+sClass:'');
+  const icons={idle:'ti-microphone',listening:'ti-microphone',processing:'ti-loader',done:'ti-check',error:'ti-x'};
+  icon.className='ti '+(icons[state]||'ti-microphone');
+  const stateLabels={idle:'Idle',listening:'Listening',processing:'Processing',done:'Done',error:'Error'};
+  stext.textContent=stateLabels[state]||'Idle';
+  sdot.style.background=state==='listening'?'var(--accent2)':state==='processing'?'var(--amber)':state==='done'?'var(--green)':state==='error'?'var(--red)':'var(--accent)';
+}
+
+function showTranscript(t){const b=document.getElementById('transcript');b.textContent='"'+t+'"';b.className='transcript show';}
+function hideTranscript(){document.getElementById('transcript').className='transcript';}
+
+async function processVoice(transcript){
+  setOrb('processing','thinking…','processing');
+  const tl=tasks.map((t,i)=>`${i}: ${t.text} [${t.done?'done':'pending'}]`).join('\n');
+  try{
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,
+        system:`You parse voice to-do commands. Return ONLY raw JSON, no markdown, no explanation.
+Current tasks:\n${tl||'(none)'}
+Return one of:
+{"action":"add","task":"clean task text"}
+{"action":"complete","index":N}
+{"action":"delete","index":N}
+{"action":"unknown"}
+Match tasks fuzzily.`,
+        messages:[{role:'user',content:transcript}]})});
+    const data=await res.json();
+    const raw=data.content.find(c=>c.type==='text')?.text||'{}';
+    const cmd=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    if(cmd.action==='add'&&cmd.task){
+      tasks.unshift({text:cmd.task,done:false,created:Date.now()});
+      saveTasks();renderTasks();
+      setOrb('done',`added ✓`,'done');
+    } else if(cmd.action==='complete'&&cmd.index>=0){
+      tasks[cmd.index].done=true;saveTasks();renderTasks();
+      setOrb('done','marked done ✓','done');
+    } else if(cmd.action==='delete'&&cmd.index>=0){
+      tasks.splice(cmd.index,1);saveTasks();renderTasks();
+      setOrb('done','deleted ✓','done');
+    } else {
+      setOrb('error',"didn't catch that",'error');
+    }
+  } catch(e){setOrb('error','error — try again','error');}
+  setTimeout(()=>{setOrb('idle','waiting for "hey todo"…','');hideTranscript();},2600);
+}
+
+function startListening(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){setOrb('error','speech not supported','error');return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();recognition.lang='en-IN';recognition.interimResults=true;
+  listening=true;setOrb('listening','listening… speak now','listening');hideTranscript();
+  clearTimeout(idleTimer);idleTimer=setTimeout(()=>{if(listening)stopListening(true);},8000);
+  recognition.onresult=(e)=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    showTranscript(final||interim);
+    if(final){clearTimeout(idleTimer);stopListening(false);processVoice(final.trim());}
+  };
+  recognition.onerror=()=>{stopListening(true);setOrb('error','mic error — try again','error');setTimeout(()=>setOrb('idle','waiting for "hey todo"…',''),2500);};
+  recognition.onend=()=>{if(listening)stopListening(true);};
+  recognition.start();
+}
+
+function stopListening(reset){
+  listening=false;clearTimeout(idleTimer);
+  try{if(recognition)recognition.stop();}catch(e){}
+  if(reset){setOrb('idle','waiting for "hey todo"…','');hideTranscript();}
+}
+
+function toggleListen(){if(listening)stopListening(true);else startListening();}
+
+function startWakeWord(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window))return;
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  wakeDetect=new SR();wakeDetect.continuous=true;wakeDetect.interimResults=true;wakeDetect.lang='en-IN';
+  wakeDetect.onresult=(e)=>{
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript.toLowerCase().replace(/[^a-z ]/g,'');
+      if(t.includes('hey todo')||t.includes('hey to do')){wakeDetect.stop();setTimeout(startListening,300);return;}
+    }
+  };
+  wakeDetect.onend=()=>{if(!listening)setTimeout(startWakeWord,500);};
+  try{wakeDetect.start();}catch(e){}
+}
+
+loadTasks().then(()=>setTimeout(startWakeWord,800));
+</script>
+</body>
+</html>
