@@ -2,10 +2,10 @@
   "name": "hey-todo",
   "version": "1.0.0",
   "private": true,
-  "description": "Voca \u2014 a premium voice-first AI task manager with the Hey Todo wake phrase.",
+  "description": "Voca \u2014 a premium voice-first AI task manager with collaborative Gemini action extraction.",
   "scripts": {
-    "start": "python3 -m http.server 4173",
-    "dev": "python3 -m http.server 4173",
+    "start": "node server.js",
+    "dev": "node server.js",
     "test": "node scripts/smoke-test.js"
   }
 }
