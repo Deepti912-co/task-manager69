@@ -1,11 +1,24 @@
 {
   "name": "Voca — Hey Todo",
   "short_name": "Voca",
-  "description": "A premium voice-first AI task manager with the Hey Todo wake phrase.",
+  "description": "A premium voice-first AI task manager with reliable server-scheduled reminders and Web Push notifications.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
   "background_color": "#080a14",
   "theme_color": "#080a14",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Add reminder",
+      "short_name": "Reminder",
+      "description": "Open Voca to create a reliable reminder.",
+      "url": "./index.html#tasks",
+      "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ],
   "icons": [
     {"src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
   ]
