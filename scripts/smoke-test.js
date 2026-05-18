@@ -3,6 +3,8 @@ const fs = require('node:fs');
 const html = fs.readFileSync('index.html', 'utf8');
 const manifest = fs.readFileSync('manifest.webmanifest', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
+const server = fs.readFileSync('server.js', 'utf8');
+const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
 const requiredSnippets = [
   '<!DOCTYPE html>',
@@ -22,12 +24,24 @@ const requiredSnippets = [
   'function addSharedTask()',
   'REALTIME_CONFIG',
   'Supabase realtime ready',
+  'GEMINI_ACTION_ENDPOINT',
+  'function analyzeProductivityIntent',
+  'function confirmSmartAction',
+  'Suggested Task Detected',
 ];
 
 for (const snippet of requiredSnippets) {
   if (!html.includes(snippet)) {
     throw new Error(`Missing expected snippet: ${snippet}`);
   }
+}
+
+if (!server.includes("gemini-2.5-flash") || !server.includes("/api/gemini/actions")) {
+  throw new Error('Server should expose the Gemini action extraction endpoint.');
+}
+
+if (pkg.scripts.start !== 'node server.js') {
+  throw new Error('Start script should run the backend server.');
 }
 
 const parsedManifest = JSON.parse(manifest);
