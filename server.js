@@ -1,6 +1,7 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 
 const ROOT = __dirname;
 loadLocalEnv(path.join(ROOT, '.env'));
@@ -8,6 +9,8 @@ loadLocalEnv(path.join(ROOT, '.env'));
 const PORT = Number(process.env.PORT || 4173);
 const GEMINI_MODEL = 'gemini-2.5-flash';
 const MAX_BODY_BYTES = 1024 * 1024;
+const REMINDER_WEBHOOK_PATH = '/api/reminders/deliver';
+const reminderStore = new Map();
 const ALLOWED_ACTIONS = new Set([
   'create_task',
   'assign_task',
@@ -44,6 +47,58 @@ function sendJson(res, status, payload) {
     'cache-control': 'no-store',
   });
   res.end(JSON.stringify(payload));
+}
+
+function getBaseUrl(req) {
+  const host = process.env.APP_BASE_URL || `http://${req.headers.host || `localhost:${PORT}`}`;
+  return host.replace(/\/$/, '');
+}
+
+function toUTCISOString(value) {
+  if (!value || typeof value !== 'string') return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+async function sendPushNotification(payload) {
+  if (!process.env.WEB_PUSH_ENDPOINT) return { delivered: false, error: 'Push endpoint not configured' };
+  const response = await fetch(process.env.WEB_PUSH_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...(process.env.WEB_PUSH_AUTH ? { authorization: `Bearer ${process.env.WEB_PUSH_AUTH}` } : {}),
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error(`Push delivery failed (${response.status})`);
+  return { delivered: true };
+}
+
+async function scheduleReminderWebhook(req, reminder) {
+  const qstashToken = process.env.QSTASH_TOKEN;
+  const publishUrl = process.env.QSTASH_URL || 'https://qstash.upstash.io/v2/publish';
+  if (!qstashToken) return { scheduled: false, warning: 'QStash token is not configured' };
+  const targetUrl = `${getBaseUrl(req)}${REMINDER_WEBHOOK_PATH}`;
+  const response = await fetch(publishUrl, {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${qstashToken}`,
+      'content-type': 'application/json',
+      'upstash-delay': `${Math.max(0, Math.floor((new Date(reminder.remindAt).getTime() - Date.now()) / 1000))}s`,
+      'upstash-retries': '5',
+      'upstash-method': 'POST',
+      'upstash-forward-Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      url: targetUrl,
+      body: {
+        reminderId: reminder.id,
+      },
+    }),
+  });
+  if (!response.ok) throw new Error(`QStash scheduling failed (${response.status})`);
+  const data = await response.json().catch(() => ({}));
+  return { scheduled: true, messageId: data.messageId || data.message_id || null };
 }
 
 function readBody(req) {
@@ -217,6 +272,75 @@ async function handleActionExtraction(req, res) {
   }
 }
 
+async function handleReminderCreate(req, res) {
+  try {
+    const raw = await readBody(req);
+    const payload = raw ? JSON.parse(raw) : {};
+    const title = cleanString(payload.title || payload.reminderText, 140);
+    const remindAt = toUTCISOString(payload.remindAt || payload.reminderDate || payload.dueDate);
+    const timezone = cleanString(payload.timezone || 'UTC', 80) || 'UTC';
+    const userId = cleanString(payload.userId || 'local-user', 80);
+    if (!title || !remindAt) return sendJson(res, 400, { error: 'title and remindAt are required' });
+    const reminder = {
+      id: crypto.randomUUID(),
+      title,
+      userId,
+      timezone,
+      remindAt,
+      createdAt: new Date().toISOString(),
+      deliveredAt: null,
+      status: 'scheduled',
+      deliveryEvents: [],
+    };
+    reminderStore.set(reminder.id, reminder);
+    let scheduleResult = { scheduled: false };
+    try {
+      scheduleResult = await scheduleReminderWebhook(req, reminder);
+      reminder.qstashMessageId = scheduleResult.messageId || null;
+    } catch (error) {
+      reminder.status = 'schedule_failed';
+      reminder.deliveryEvents.push({ at: new Date().toISOString(), type: 'schedule_failed', detail: error.message });
+    }
+    return sendJson(res, 201, { reminder, schedule: scheduleResult });
+  } catch (error) {
+    return sendJson(res, 422, { error: error.message });
+  }
+}
+
+async function handleReminderDeliver(req, res) {
+  try {
+    const raw = await readBody(req);
+    const payload = raw ? JSON.parse(raw) : {};
+    const reminderId = cleanString(payload.reminderId, 80);
+    const reminder = reminderStore.get(reminderId);
+    if (!reminder) return sendJson(res, 404, { error: 'Reminder not found' });
+    if (reminder.status === 'delivered') return sendJson(res, 200, { ok: true, reminder });
+    try {
+      await sendPushNotification({
+        type: 'reminder',
+        title: 'Reminder',
+        body: reminder.title,
+        reminderId,
+        url: '/?tab=notifications',
+      });
+      reminder.status = 'delivered';
+      reminder.deliveredAt = new Date().toISOString();
+      reminder.deliveryEvents.push({ at: reminder.deliveredAt, type: 'delivered' });
+    } catch (error) {
+      reminder.status = 'delivery_failed';
+      reminder.deliveryEvents.push({ at: new Date().toISOString(), type: 'delivery_failed', detail: error.message });
+      return sendJson(res, 502, { error: error.message, reminder });
+    }
+    return sendJson(res, 200, { ok: true, reminder });
+  } catch (error) {
+    return sendJson(res, 422, { error: error.message });
+  }
+}
+
+function handleReminderList(res) {
+  sendJson(res, 200, { reminders: Array.from(reminderStore.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt)) });
+}
+
 function serveStatic(req, res) {
   const requestUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const pathname = decodeURIComponent(requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname);
@@ -246,6 +370,9 @@ function serveStatic(req, res) {
 
 const server = http.createServer((req, res) => {
   if (req.method === 'POST' && req.url === '/api/gemini/actions') return handleActionExtraction(req, res);
+  if (req.method === 'POST' && req.url === '/api/reminders') return handleReminderCreate(req, res);
+  if (req.method === 'POST' && req.url === REMINDER_WEBHOOK_PATH) return handleReminderDeliver(req, res);
+  if (req.method === 'GET' && req.url === '/api/reminders') return handleReminderList(res);
   if (req.method === 'GET' || req.method === 'HEAD') return serveStatic(req, res);
   res.writeHead(405, { allow: 'GET, HEAD, POST' });
   res.end('Method not allowed');
